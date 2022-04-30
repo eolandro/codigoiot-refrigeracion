@@ -29,4 +29,4 @@ Si tengo alta demanda o sobre carga, se activa la refrigeración automática
 
 Si tengo alta demanda o sobrecarga de funcionamiento y ademas temperatura alta, se activan ambas refrigeraciones
 
-![Maquina abstracta](https://github.com/eolandro/codigoiot-refrigeracion/diagram/Diagrama.png)
+![Maquina abstracta](https://github.com/eolandro/codigoiot-refrigeracion/blob/main/diagram/Diagrama.png)
