@@ -3,8 +3,7 @@
  * Por: Leonardo Valdes arteaga (eolandro)
  * Fecha: 28 de junio de 2021
  * 
- * Programa de refrigeracion basado en una maquina de estados
- * o automata finito
+ * Esto es una muestra de la estructura básica de un programa
  */
 
 // Bibliotecas
@@ -21,43 +20,51 @@
 // LEDS
 #define LED_Manual 13
 #define LED_Auto 12
+// Estructuras
+struct sTiempo{
+  unsigned long InicioTiempo;
+  unsigned long FinTiempo;
+  unsigned long NSegundos;
+};
+/////////////////////////////////
+struct sBotones{
+  int Manual;
+  int Alta;
+  int Sobre;
+};
 // Variables
 byte Estado = 0;
 boolean Temp = false;
 boolean LecT = false;
 float t = 0;
-int Manual = 0;
-int Alta = 0;
-int Sobre = 0;
-unsigned long InicioTiempo;
-unsigned long FinTiempo;
-unsigned long NSegundos = 0;
+sTiempo gsTiempo = {0,0,0};
+sBotones gsBotones = {0,0,0};
 // Definición de objetos
 DHT dht(DHTPIN, DHTTYPE);
 ////////////////////////////////////////////////////////////////
 void info(){
   String Res = "";
-  Serial.println(Res+t+","+NSegundos+","+Estado+","+Manual+","+Alta+","+Sobre);
+  Serial.println(Res+t+","+gsTiempo.NSegundos+","+Estado+","+gsBotones.Manual+","+gsBotones.Alta+","+gsBotones.Sobre);
 }
 ////////////////////////////////////////////////////////////////
 void controlTiempo(){
   unsigned long Delta;
-  FinTiempo = millis();
-  Delta = FinTiempo - InicioTiempo;
+  gsTiempo.FinTiempo = millis();
+  Delta = gsTiempo.FinTiempo - gsTiempo.InicioTiempo;
   if (Delta >= 1000){
-    InicioTiempo = FinTiempo;
-    NSegundos++;
+    gsTiempo.InicioTiempo = gsTiempo.FinTiempo;
+    gsTiempo.NSegundos++;
   }
 }
 ////////////////////////////////////////////////////////////////
 void revisarInput(){
-  Manual = digitalRead(BTN1_Manual); //Leer el pin del boton1 (Manual)
-  Alta   = digitalRead(BTN2_Alta); //Leer el pin del boton1 (alta demanda)
-  Sobre = digitalRead(BTN3_Sobre); //Leer el pin del boton1 (sobrecarga)
+  gsBotones.Manual = digitalRead(BTN1_Manual); //Leer el pin del boton1 (Manual)
+  gsBotones.Alta   = digitalRead(BTN2_Alta); //Leer el pin del boton1 (alta demanda)
+  gsBotones.Sobre = digitalRead(BTN3_Sobre); //Leer el pin del boton1 (sobrecarga)
 }
 ////////////////////////////////////////////////////////////////
 void revisarTemperatura(){
-  byte reloj = NSegundos % 2;
+  byte reloj = gsTiempo.NSegundos % 2;
   /////////////////////
   if (reloj == 1 && !LecT){
     t = dht.readTemperature(); // Leer la temp en celsius
@@ -81,13 +88,13 @@ void revisarTemperatura(){
 ////////////////////////////////////////////////////////////////
 void cambioEstado(){
   //////////////////////////////////////////
-  boolean AltaSobre = Alta == LOW || Sobre == LOW;
+  boolean AltaSobre = gsBotones.Alta == LOW || gsBotones.Sobre == LOW;
   if (AltaSobre && Temp){
     Estado = 3;
     return;
   }
   /////////////////////////////////////////
-  if (Manual == LOW){
+  if (gsBotones.Manual == LOW){
     Estado = 1;
     return;
   }
@@ -141,7 +148,7 @@ void setup() {// Inicio de void setup ()
   dht.begin();
   delay (5000);
   ////////////////////////////////////////////////////////
-  InicioTiempo = millis();
+  gsTiempo.InicioTiempo = millis();
 }// Fin de void setup
 
 // Cuerpo del programa - Se ejecuta constamente
